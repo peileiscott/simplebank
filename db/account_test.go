@@ -2,10 +2,10 @@ package db
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/peileiscott/simplebank/util"
 	"github.com/stretchr/testify/require"
 )
@@ -16,7 +16,7 @@ func TestQueries_CreateAccount(t *testing.T) {
 
 func TestQueries_GetAccountByID(t *testing.T) {
 	account1 := createRandomAccount(t)
-	account2, err := testQueries.GetAccountByID(context.Background(), account1.ID)
+	account2, err := testStore.GetAccountByID(context.Background(), account1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
 
@@ -37,7 +37,7 @@ func TestQueries_GetAccounts(t *testing.T) {
 		Offset: 5,
 	}
 
-	accounts, err := testQueries.GetAccounts(context.Background(), arg)
+	accounts, err := testStore.GetAccounts(context.Background(), arg)
 	require.NoError(t, err)
 	require.Len(t, accounts, 5)
 
@@ -46,31 +46,31 @@ func TestQueries_GetAccounts(t *testing.T) {
 	}
 }
 
-func TestQueries_UpdateAccount(t *testing.T) {
+func TestQueries_IncreaseAccountBalance(t *testing.T) {
 	account1 := createRandomAccount(t)
 
-	arg := UpdateAccountParams{
-		ID:      account1.ID,
-		Balance: util.RandomMoney(),
+	arg := IncreaseAccountBalanceParams{
+		ID:     account1.ID,
+		Amount: util.RandomMoney(),
 	}
 
-	account2, err := testQueries.UpdateAccount(context.Background(), arg)
+	account2, err := testStore.IncreaseAccountBalance(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, account2)
 
 	require.Equal(t, account1.ID, account2.ID)
 	require.Equal(t, account1.Owner, account2.Owner)
-	require.Equal(t, arg.Balance, account2.Balance)
+	require.Equal(t, account1.Balance+arg.Amount, account2.Balance)
 	require.Equal(t, account1.Currency, account2.Currency)
 	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, time.Second)
 }
 
 func TestQueries_DeleteAccount(t *testing.T) {
 	account1 := createRandomAccount(t)
-	err := testQueries.DeleteAccount(context.Background(), account1.ID)
+	err := testStore.DeleteAccount(context.Background(), account1.ID)
 	require.NoError(t, err)
 
-	account2, err := testQueries.GetAccountByID(context.Background(), account1.ID)
+	account2, err := testStore.GetAccountByID(context.Background(), account1.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, pgx.ErrNoRows.Error())
 	require.Empty(t, account2)
@@ -83,7 +83,7 @@ func createRandomAccount(t *testing.T) Account {
 		Currency: util.RandomCurrency(),
 	}
 
-	account, err := testQueries.CreateAccount(context.Background(), arg)
+	account, err := testStore.CreateAccount(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, account)
 

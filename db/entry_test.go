@@ -17,7 +17,7 @@ func TestQueries_CreateEntry(t *testing.T) {
 func TestQueries_GetEntryByID(t *testing.T) {
 	account := createRandomAccount(t)
 	entry1 := createRandomEntry(t, account)
-	entry2, err := testQueries.GetEntryByID(context.Background(), entry1.ID)
+	entry2, err := testStore.GetEntryByID(context.Background(), entry1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, entry2)
 
@@ -39,7 +39,7 @@ func TestQueries_GetEntries(t *testing.T) {
 		Offset:    5,
 	}
 
-	entries, err := testQueries.GetEntries(context.Background(), arg)
+	entries, err := testStore.GetEntries(context.Background(), arg)
 	require.NoError(t, err)
 	require.Len(t, entries, 5)
 
@@ -55,7 +55,7 @@ func createRandomEntry(t *testing.T, account Account) Entry {
 		Amount:    util.RandomMoney(),
 	}
 
-	entry, err := testQueries.CreateEntry(context.Background(), arg)
+	entry, err := testStore.CreateEntry(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, entry)
 

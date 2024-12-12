@@ -19,7 +19,7 @@ type Querier interface {
 	GetEntryByID(ctx context.Context, id int64) (Entry, error)
 	GetTransferByID(ctx context.Context, id int64) (Transfer, error)
 	GetTransfers(ctx context.Context, arg GetTransfersParams) ([]Transfer, error)
-	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
+	IncreaseAccountBalance(ctx context.Context, arg IncreaseAccountBalanceParams) (Account, error)
 }
 
 var _ Querier = (*Queries)(nil)

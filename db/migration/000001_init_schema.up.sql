@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS accounts (
     owner      TEXT        NOT NULL,
     balance    BIGINT      NOT NULL,
     currency   VARCHAR(3)  NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT check_balance_non_negative CHECK (balance >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS entries (

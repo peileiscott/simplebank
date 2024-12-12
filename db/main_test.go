@@ -7,19 +7,22 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/peileiscott/simplebank/util"
 )
 
-const dsn = "postgresql://postgres:password@localhost:5432/simplebank?sslmode=disable"
-
-var testQueries *Queries
+var testStore Store
 
 func TestMain(m *testing.M) {
-	pool, err := pgxpool.New(context.Background(), dsn)
+	config, err := util.LoadConfig("../")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
 
+	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
 
-	testQueries = New(pool)
+	testStore = NewStore(connPool)
 	os.Exit(m.Run())
 }
